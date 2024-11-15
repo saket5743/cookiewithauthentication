@@ -1,7 +1,5 @@
 import mongoose, { Schema, model, Document, CallbackWithoutResultAndOptionalError } from 'mongoose';
-import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs';
-import { NextFunction } from 'express';
 
 interface IUser extends Document {
   email: string;
@@ -25,7 +23,7 @@ const UserSchema = new Schema<IUser>({
   },
 });
 
-// Password hashing and comparison
+// Password hashing and compare
 UserSchema.pre<UserDocument>('save', async function (next: CallbackWithoutResultAndOptionalError) {
   if (!this.isModified('password')) return next();
   const salt = await bcrypt.genSalt(10)
