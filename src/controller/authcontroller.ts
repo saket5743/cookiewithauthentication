@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Sign up a new user
+// Sign up
 export const signUp = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
   try {
@@ -17,7 +17,7 @@ export const signUp = async (req: Request, res: Response): Promise<void> => {
     const newUser = new User({ email, password });
     await newUser.save();
 
-    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET as string, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: newUser._id, email: email }, process.env.JWT_SECRET as string, { expiresIn: '1h' });
 
     res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
     res.status(201).json({ message: 'User created', token, email });
@@ -27,7 +27,7 @@ export const signUp = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Log in an existing user
+// Log in
 export const login = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
 
@@ -42,7 +42,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ userId: user?._id }, process.env.JWT_SECRET as string, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user?._id, email: email }, process.env.JWT_SECRET as string, { expiresIn: '1h' });
 
     res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
     res.status(200).json({ message: 'Login successful', token, email });
@@ -52,7 +52,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Logout the user
+// Logout
 export const logout = (req: Request, res: Response) => {
   res.clearCookie('token', { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
 
